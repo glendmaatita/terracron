@@ -1,4 +1,4 @@
-group:
+schedule:
   - name: terraform
     setting:
       strict: true

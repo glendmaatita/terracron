@@ -20,5 +20,5 @@ class Resource(BaseModel):
     setting: Setting = Field(default=None, title="Resource settings")
     schedule: List[Schedule] = Field(default=None, title="Resource schedules")
 
-class Group(BaseModel):
-    resources: List[Resource] = Field(default=None, title="Group resources")
+class Schedule(BaseModel):
+    resources: List[Resource] = Field(default=None, title="Schedule resources")
