@@ -12,7 +12,7 @@ cron:
         value: "supabase_access_token"
         commit: false
       - file: tf.resources.project
-        node: resources.supabase_project.primary
+        node: resource.supabase_project.primary
         key: instance_size
         value: "small"
         commit: true

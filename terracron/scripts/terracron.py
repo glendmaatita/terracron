@@ -18,17 +18,34 @@ class Terracron:
                 file_path = os.path.join(os.path.abspath(self.scheduler_dir_path), schedule.file.replace('.', '/')) + ".tf"
                 hcl = self.get_hcl_content(file_path)
                 hcl_node = self.parse_hcl_node(schedule.node)
+                # Set new value
+                print(hcl)
+                for resource_entry in hcl[hcl_node['resource_type']]:
+                    if hcl_node['resource_name'] in resource_entry:  # Ensure resource name exists
+                        resource_block = resource_entry[hcl_node['resource_name']]
 
-                # set new value
-                hcl[hcl_node['resource_type']] = {
-                    hcl_node['resource_name']: [{
-                        hcl_node['resource_name']: schedule.value
-                    }]
-                }
+                        # If resource_id is specified (e.g., 'primary' in 'supabase_project.primary')
+                        if hcl_node['resource_id']:
+                            if isinstance(resource_block, dict) and hcl_node['resource_id'] in resource_block:
+                                
+                                if schedule.key in resource_block[hcl_node['resource_id']]:
+                                    resource_block[hcl_node['resource_id']][schedule.key] = schedule.value  # Update value
 
+                                else:  # No resource_id (e.g., 'provider' type)
+                                    # print(resource_block)
+                                    if isinstance(resource_block, dict) and schedule.key in resource_block:
+                                        resource_block[schedule.key] = schedule.value  # Update value
+
+                                    elif isinstance(resource_block, list):  # Handle lists of dicts (e.g., required_providers)
+                                        for item in resource_block:
+                                            if isinstance(item, dict) and schedule.key in item:
+                                                item[schedule.key] = schedule.value  # Update value
+
+                print(hcl)
                 hcl_output = self.convert_dict_to_hcl(hcl)
-                
-                print(hcl_output)
+                # print(hcl_output)
+                # with open(file_path, "w") as f:
+                #     f.write(hcl_output)
 
         return cron
     
