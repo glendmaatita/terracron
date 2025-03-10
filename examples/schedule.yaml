@@ -4,6 +4,7 @@ cron:
       strict: true
       git:
         url: git@github.com:glendmaatita/terracron.git
+        branch: main
         directory: examples/tf
     schedules:
       - file: tf.provider

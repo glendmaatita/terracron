@@ -1,13 +1,16 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='terrafron',
+    name='terracron',
     version='0.1.0',
     packages=find_packages(),
     include_package_data=True,
     install_requires=[
         "pydantic>=2.10.6",
-        "schedule>=1.2.2"
+        "python-dotenv>=1.0.1",
+        "python-hcl2>=6.1.1",
+        "pyyaml>=6.0.2",
+        "schedule>=1.2.2",
     ],
     entry_points={
         'console_scripts': [
