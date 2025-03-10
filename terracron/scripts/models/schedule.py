@@ -8,6 +8,7 @@ class Git(BaseModel):
 
 class Setting(BaseModel):
     git: Git = Field(default=None, title="Git Settings")
+    branch: str = Field(default=None, title="Git branch")
     strict: bool = Field(default=None, title="Only run Terraform if there are changes on selected resources")
 
 class Schedule(BaseModel):
