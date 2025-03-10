@@ -1,5 +1,5 @@
 import argparse
-from .scripts.terracron import Terracron
+from scripts.terracron import Terracron
 from dotenv import load_dotenv
 
 def main():

@@ -11,14 +11,16 @@ class Setting(BaseModel):
     strict: bool = Field(default=None, title="Only run Terraform if there are changes on selected resources")
 
 class Schedule(BaseModel):
+    file: str = Field(default=None, title="Terraform file")
     node: str = Field(default=None, title="Node name")
+    key: str = Field(default=None, title="Key name")
     value: str = Field(default=None, title="Expected value")
     commit: bool = Field(default=None, title="Commit changes to Git repository")
 
 class Resource(BaseModel):
     name: str = Field(default=None, title="Resource name")
     setting: Setting = Field(default=None, title="Resource settings")
-    schedule: List[Schedule] = Field(default=None, title="Resource schedules")
+    schedules: List[Schedule] = Field(default=None, title="Resource schedules")
 
-class Schedule(BaseModel):
-    resources: List[Resource] = Field(default=None, title="Schedule resources")
+class Cron(BaseModel):
+    cron: List[Resource] = Field(default=None, title="Schedule resources")

@@ -1,4 +1,4 @@
-schedule:
+cron:
   - name: terraform
     setting:
       strict: true
@@ -6,10 +6,14 @@ schedule:
         url: git@github.com:glendmaatita/terracron.git
         directory: examples/tf
     schedules:
-      - node: provider.provider.supabase.access_token
+      - file: tf.provider
+        node: provider.supabase.access_token
+        key: access_token
         value: "supabase_access_token"
         commit: false
-      - node: resources.project.supabase_project.primary.instance_size
+      - file: tf.resources.project
+        node: resources.supabase_project.primary
+        key: instance_size
         value: "small"
         commit: true
       

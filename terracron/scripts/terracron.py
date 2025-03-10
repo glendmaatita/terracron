@@ -1,21 +1,69 @@
-import yaml
-from .models.schedule import Schedule
+import yaml, hcl2, os
+from .models.schedule import Cron
 
 class Terracron:
     def __init__(self, scheduler):
         self.scheduler = scheduler
+        self.scheduler_dir_path = os.path.dirname(scheduler)
 
     def schedule(self):
-        schedule = self.load_config()
+        cron = self.load_config()
 
-    def load_config(self) -> Schedule:
+    def load_config(self) -> Cron:
         data = self.open_config()
-        schedule = Schedule(**data)
-        return schedule
+        cron = Cron(**data)
+
+        for cron in cron.cron:
+            for schedule in cron.schedules[:]:
+                file_path = os.path.join(os.path.abspath(self.scheduler_dir_path), schedule.file.replace('.', '/')) + ".tf"
+                hcl = self.get_hcl_content(file_path)
+                hcl_node = self.parse_hcl_node(schedule.node)
+
+                # set new value
+                hcl[hcl_node['resource_type']] = {
+                    hcl_node['resource_name']: [{
+                        hcl_node['resource_name']: schedule.value
+                    }]
+                }
+
+                hcl_output = self.convert_dict_to_hcl(hcl)
+                
+                print(hcl_output)
+
+        return cron
+    
+    def convert_dict_to_hcl(self, data, indent=0):
+        hcl_str = ""
+        indent_str = "  " * indent
+
+        for key, value in data.items():
+            if isinstance(value, dict):
+                hcl_str += f'{indent_str}{key} {{\n{self.convert_dict_to_hcl(value, indent + 1)}{indent_str}}}\n'
+            elif isinstance(value, list):
+                for item in value:
+                    hcl_str += f'{indent_str}{key} {{\n{self.convert_dict_to_hcl(item, indent + 1)}{indent_str}}}\n'
+            else:
+                hcl_str += f'{indent_str}{key} = "{value}"\n'
+
+        return hcl_str
+    
+    def get_hcl_content(self, file):
+        dict = {}
+        with open(file, 'r') as file:
+            dict = hcl2.load(file)
+        return dict
+    
+    def parse_hcl_node(self, node):
+        parts = node.split(".")
+        return {
+            "resource_type": parts[0],
+            "resource_name": parts[1],
+            "resource_id": parts[2]
+    }
 
     # open the configuration file    
     def open_config(self):
-        with open(self.installer, 'r') as stream:
+        with open(self.scheduler, 'r') as stream:
             try:
                 data = yaml.safe_load(stream)
                 return data
